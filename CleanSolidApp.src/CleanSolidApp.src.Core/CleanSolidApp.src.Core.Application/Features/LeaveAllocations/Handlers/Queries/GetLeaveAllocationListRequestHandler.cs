@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CleanSolidApp.src.Core.Application.DTOs.LeaveAllocationDTOs;
 using CleanSolidApp.src.Core.Application.Features.LeaveAllocations.Requests.Queries;
-using CleanSolidApp.src.Core.Application.Persistence.Contracts;
+using CleanSolidApp.src.Core.Application.Contracts.Persistence;
 using MediatR;
 
 namespace CleanSolidApp.src.Core.Application.Features.LeaveAllocations.Handlers.Queries;

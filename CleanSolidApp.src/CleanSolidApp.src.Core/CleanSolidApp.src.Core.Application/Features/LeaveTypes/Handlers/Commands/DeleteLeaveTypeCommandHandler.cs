@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CleanSolidApp.src.Core.Application.Exceptions;
 using CleanSolidApp.src.Core.Application.Features.LeaveTypes.Requests.Commands;
-using CleanSolidApp.src.Core.Application.Persistence.Contracts;
+using CleanSolidApp.src.Core.Application.Contracts.Persistence;
 using CleanSolidApp.src.Core.Domain;
 using MediatR;
 

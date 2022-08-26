@@ -6,7 +6,7 @@ using AutoMapper;
 using CleanSolidApp.src.Core.Application.DTOs.LeaveRequestDTOs.Validators;
 using CleanSolidApp.src.Core.Application.Exceptions;
 using CleanSolidApp.src.Core.Application.Features.LeaveRequests.Requests.Commands;
-using CleanSolidApp.src.Core.Application.Persistence.Contracts;
+using CleanSolidApp.src.Core.Application.Contracts.Persistence;
 using MediatR;
 
 namespace CleanSolidApp.src.Core.Application.Features.LeaveRequests.Handlers.Commands;
