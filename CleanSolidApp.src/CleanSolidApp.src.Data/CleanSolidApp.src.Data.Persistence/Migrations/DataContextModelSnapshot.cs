@@ -36,6 +36,9 @@ namespace CleanSolidApp.src.Data.Persistence.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("EmployeeID")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -97,6 +100,9 @@ namespace CleanSolidApp.src.Data.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("RequestComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestingEmployeeID")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")

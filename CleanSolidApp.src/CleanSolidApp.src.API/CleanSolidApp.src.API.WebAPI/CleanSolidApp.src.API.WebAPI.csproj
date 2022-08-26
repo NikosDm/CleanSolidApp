@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\CleanSolidApp.src.Core\CleanSolidApp.src.Core.Application\CleanSolidApp.src.Core.Application.csproj" />
     <ProjectReference Include="..\..\CleanSolidApp.src.Data\CleanSolidApp.src.Data.Infrastructure\CleanSolidApp.src.Data.Infrastructure.csproj" />
     <ProjectReference Include="..\..\CleanSolidApp.src.Data\CleanSolidApp.src.Data.Persistence\CleanSolidApp.src.Data.Persistence.csproj" />
+    <ProjectReference Include="..\..\CleanSolidApp.src.Data\CleanSolidApp.src.Data.Identity\CleanSolidApp.src.Data.Identity.csproj" />
   </ItemGroup>
 
 </Project>

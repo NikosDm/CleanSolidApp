@@ -6,12 +6,14 @@ using CleanSolidApp.src.Core.Application.DTOs.LeaveTypeDTOs;
 using CleanSolidApp.src.Core.Application.Features.LeaveTypes.Requests.Commands;
 using CleanSolidApp.src.Core.Application.Features.LeaveTypes.Requests.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanSolidApp.src.API.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Administrator")]
 public class LeaveTypesController : ControllerBase
 {
     private readonly IMediator _mediator;

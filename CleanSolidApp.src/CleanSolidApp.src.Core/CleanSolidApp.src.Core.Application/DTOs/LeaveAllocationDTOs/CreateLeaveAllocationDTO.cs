@@ -6,9 +6,7 @@ using CleanSolidApp.src.Core.Application.DTOs.Common;
 
 namespace CleanSolidApp.src.Core.Application.DTOs.LeaveAllocationDTOs;
 
-public class CreateLeaveAllocationDTO : ILeaveAllocationDTO
+public class CreateLeaveAllocationDTO 
 {
-    public int NumberOfDays { get; set; }
     public int LeaveTypeID { get; set; }
-    public int Period { get; set; }
 }

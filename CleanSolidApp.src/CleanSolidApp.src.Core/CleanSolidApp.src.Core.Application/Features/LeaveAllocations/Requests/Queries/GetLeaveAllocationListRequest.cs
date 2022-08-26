@@ -9,5 +9,5 @@ namespace CleanSolidApp.src.Core.Application.Features.LeaveAllocations.Requests.
 
 public class GetLeaveAllocationListRequest : IRequest<List<LeaveAllocationDTO>>
 {
-    
+    public bool IsLoggedInUser { get; set; }
 }

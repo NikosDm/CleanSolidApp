@@ -7,7 +7,7 @@ using MediatR;
 
 namespace CleanSolidApp.src.Core.Application.Features.LeaveAllocations.Requests.Commands;
 
-public class CreateLeaveAllocationCommand : IRequest<int>
+public class CreateLeaveAllocationCommand : IRequest<Unit>
 {
     public CreateLeaveAllocationDTO CreateLeaveAllocationDTO { get; set; }
 }

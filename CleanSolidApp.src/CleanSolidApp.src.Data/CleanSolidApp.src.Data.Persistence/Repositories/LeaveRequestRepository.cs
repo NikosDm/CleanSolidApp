@@ -33,4 +33,12 @@ public class LeaveRequestRepository: GenericRepository<LeaveRequest>, ILeaveRequ
     {
         return await _dbContext.LeaveRequests.Include(p => p.LeaveType).FirstOrDefaultAsync(x => x.ID == id);
     }
+
+    public async Task<List<LeaveRequest>> GetLeaveRequestsWithDetails(string userId)
+    {
+        var leaveRequests = await _dbContext.LeaveRequests.Where(q=> q.RequestingEmployeeID == userId)
+            .Include(q => q.LeaveType)
+            .ToListAsync();
+        return leaveRequests;
+    }
 }

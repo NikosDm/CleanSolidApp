@@ -9,5 +9,5 @@ namespace CleanSolidApp.src.Core.Application.Features.LeaveRequests.Requests.Que
 
 public class GetLeaveRequestListRequest: IRequest<List<LeaveRequestListItemDTO>>
 {
-    
+    public bool IsLoggedInUser { get; set; }
 }

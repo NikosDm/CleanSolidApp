@@ -12,4 +12,5 @@ public class LeaveAllocation : BaseDomainEntity
     public LeaveType LeaveType { get; set; }
     public int LeaveTypeID { get; set; }
     public int Period { get; set; }
+    public string EmployeeID { get; set; }
 }
