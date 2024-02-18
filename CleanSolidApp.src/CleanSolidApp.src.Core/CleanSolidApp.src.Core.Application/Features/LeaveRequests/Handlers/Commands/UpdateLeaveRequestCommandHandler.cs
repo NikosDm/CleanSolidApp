@@ -15,46 +15,40 @@ namespace CleanSolidApp.src.Core.Application.Features.LeaveRequests.Handlers.Com
 
 public class UpdateLeaveRequestCommandHandler : IRequestHandler<UpdateLeaveRequestCommand, Unit>
 {
-    private readonly ILeaveRequestRepository _leaveRequestRepository;
-    private readonly ILeaveTypeRepository _leaveTypeRepository;
-    private readonly ILeaveAllocationRepository _leaveAllocationRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
 
-    public UpdateLeaveRequestCommandHandler(ILeaveRequestRepository leaveRequestRepository, 
-        ILeaveTypeRepository leaveTypeRepository, 
-        ILeaveAllocationRepository leaveAllocationRepository,
+    public UpdateLeaveRequestCommandHandler(IUnitOfWork unitOfWork, 
         IHttpContextAccessor httpContextAccessor,
         IMapper mapper)
     {
-        _leaveRequestRepository = leaveRequestRepository;
-        _leaveTypeRepository = leaveTypeRepository;
-        _leaveAllocationRepository = leaveAllocationRepository;
+        _unitOfWork = unitOfWork;
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
     }
 
     public async Task<Unit> Handle(UpdateLeaveRequestCommand request, CancellationToken cancellationToken)
     {
-        var validator = new UpdateLeaveRequestDTOValidator(_leaveTypeRepository);
+        var validator = new UpdateLeaveRequestDTOValidator(_unitOfWork.LeaveTypeRepository);
 
         var validationResult = await validator.ValidateAsync(request.LeaveRequestDTO);
 
         if (!validationResult.IsValid) throw new ValidationException(validationResult);
 
-        var leaveRequest = await _leaveRequestRepository.GetAsync(request.LeaveRequestID);
+        var leaveRequest = await _unitOfWork.LeaveRequestRepository.GetAsync(request.LeaveRequestID);
 
         if (request.LeaveRequestDTO != null)
         {
             _mapper.Map(request.LeaveRequestDTO, leaveRequest);
 
-            await _leaveRequestRepository.UpdateAsync(leaveRequest);
+            await _unitOfWork.LeaveRequestRepository.UpdateAsync(leaveRequest);
         }
         else if (request.ChangeLeaveRequestApprovalDTO != null)
         {
             var userID = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UID")?.Value;
 
-            var allocation = await _leaveAllocationRepository.GetUserAllocations(userID, request.LeaveRequestDTO.LeaveTypeID);
+            var allocation = await _unitOfWork.LeaveAllocationRepository.GetUserAllocations(userID, request.LeaveRequestDTO.LeaveTypeID);
             
             int daysRequested = (int)(request.LeaveRequestDTO.EndDate - request.LeaveRequestDTO.StartDate).TotalDays;
             
@@ -66,9 +60,11 @@ public class UpdateLeaveRequestCommandHandler : IRequestHandler<UpdateLeaveReque
 
             allocation.NumberOfDays -= daysRequested;
 
-            await _leaveAllocationRepository.UpdateAsync(allocation);
+            await _unitOfWork.LeaveAllocationRepository.UpdateAsync(allocation);
 
-            await _leaveRequestRepository.ChangeApprovalStatusAsync(leaveRequest, request.ChangeLeaveRequestApprovalDTO.Approved);
+            await _unitOfWork.LeaveRequestRepository.ChangeApprovalStatusAsync(leaveRequest, request.ChangeLeaveRequestApprovalDTO.Approved);
+
+            await _unitOfWork.Save();
         }
 
         return Unit.Value;

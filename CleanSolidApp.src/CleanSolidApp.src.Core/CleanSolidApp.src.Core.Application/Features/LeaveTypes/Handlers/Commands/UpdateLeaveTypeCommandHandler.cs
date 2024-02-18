@@ -13,12 +13,12 @@ namespace CleanSolidApp.src.Core.Application.Features.LeaveTypes.Handlers.Comman
 
 public class UpdateLeaveTypeCommandHandler : IRequestHandler<UpdateLeaveTypeCommand, Unit>
 {
-    private readonly ILeaveTypeRepository _leaveTypeRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UpdateLeaveTypeCommandHandler(ILeaveTypeRepository leaveTypeRepository, IMapper mapper)
+    public UpdateLeaveTypeCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _leaveTypeRepository = leaveTypeRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -30,11 +30,13 @@ public class UpdateLeaveTypeCommandHandler : IRequestHandler<UpdateLeaveTypeComm
 
         if (!validationResult.IsValid) throw new ValidationException(validationResult);
         
-        var leaveType = await _leaveTypeRepository.GetAsync(request.LeaveTypeDTO.ID);
+        var leaveType = await _unitOfWork.LeaveTypeRepository.GetAsync(request.LeaveTypeDTO.ID);
 
         _mapper.Map(request.LeaveTypeDTO, leaveType);
 
-        await _leaveTypeRepository.UpdateAsync(leaveType);
+        await _unitOfWork.LeaveTypeRepository.UpdateAsync(leaveType);
+
+        await _unitOfWork.Save();
 
         return Unit.Value;
     }

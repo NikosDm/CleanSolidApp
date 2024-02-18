@@ -20,23 +20,17 @@ namespace CleanSolidApp.src.Core.Application.Features.LeaveRequests.Handlers.Com
 
 public class CreateLeaveRequestCommandHandler : IRequestHandler<CreateLeaveRequestCommand, int>
 {
-    private readonly ILeaveRequestRepository _leaveRequestRepository;
-    private readonly ILeaveAllocationRepository _leaveAllocationRepository;
-    private readonly ILeaveTypeRepository _leaveTypeRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IEmailSender _emailSender;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CreateLeaveRequestCommandHandler(ILeaveRequestRepository leaveRequestRepository, 
-        ILeaveTypeRepository leaveTypeRepository, 
-        ILeaveAllocationRepository leaveAllocationRepository,
+    public CreateLeaveRequestCommandHandler(IUnitOfWork unitOfWork, 
         IMapper mapper,
         IHttpContextAccessor httpContextAccessor,
         IEmailSender emailSender)
     {
-        _leaveRequestRepository = leaveRequestRepository;
-        _leaveTypeRepository = leaveTypeRepository;
-        _leaveAllocationRepository = leaveAllocationRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
         _emailSender = emailSender;
@@ -44,7 +38,7 @@ public class CreateLeaveRequestCommandHandler : IRequestHandler<CreateLeaveReque
 
     public async Task<int> Handle(CreateLeaveRequestCommand request, CancellationToken cancellationToken)
     {
-        var validator = new CreateLeaveRequestDTOValidator(_leaveTypeRepository);
+        var validator = new CreateLeaveRequestDTOValidator(_unitOfWork.LeaveTypeRepository);
 
         var validationResult = await validator.ValidateAsync(request.CreateLeaveRequestDTO);
 
@@ -52,7 +46,7 @@ public class CreateLeaveRequestCommandHandler : IRequestHandler<CreateLeaveReque
 
         var userID = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UID")?.Value;
 
-        var allocation = await _leaveAllocationRepository.GetUserAllocations(userID, request.CreateLeaveRequestDTO.LeaveTypeID);
+        var allocation = await _unitOfWork.LeaveAllocationRepository.GetUserAllocations(userID, request.CreateLeaveRequestDTO.LeaveTypeID);
         
         int daysRequested = (int)(request.CreateLeaveRequestDTO.EndDate - request.CreateLeaveRequestDTO.StartDate).TotalDays;
         
@@ -66,7 +60,7 @@ public class CreateLeaveRequestCommandHandler : IRequestHandler<CreateLeaveReque
 
         leaveRequest.RequestingEmployeeID = userID;
 
-        leaveRequest = await _leaveRequestRepository.AddAsync(leaveRequest);
+        leaveRequest = await _unitOfWork.LeaveRequestRepository.AddAsync(leaveRequest);
 
         try 
         {
@@ -87,6 +81,8 @@ public class CreateLeaveRequestCommandHandler : IRequestHandler<CreateLeaveReque
             //Log this
             Console.WriteLine(ex.Message);
         }
+
+        await _unitOfWork.Save();
 
         return leaveRequest.ID;
     }

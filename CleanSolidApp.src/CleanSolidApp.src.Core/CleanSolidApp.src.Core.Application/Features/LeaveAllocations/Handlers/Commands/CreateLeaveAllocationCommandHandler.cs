@@ -15,35 +15,33 @@ namespace CleanSolidApp.src.Core.Application.Features.LeaveAllocations.Handlers.
 
 public class CreateLeaveAllocationCommandHandler : IRequestHandler<CreateLeaveAllocationCommand, Unit>
 {
-    private readonly ILeaveAllocationRepository _leaveAllocationRepository;
-    private readonly ILeaveTypeRepository _leaveTypeRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
 
-    public CreateLeaveAllocationCommandHandler(ILeaveAllocationRepository leaveAllocationRepository, ILeaveTypeRepository leaveTypeRepository, IMapper mapper, IUserService userService)
+    public CreateLeaveAllocationCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
     {
-        _leaveAllocationRepository = leaveAllocationRepository;
-        _leaveTypeRepository = leaveTypeRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _userService = userService;
     }
     
     public async Task<Unit> Handle(CreateLeaveAllocationCommand request, CancellationToken cancellationToken)
     {
-        var validator = new CreateLeaveAllocationDTOValidator(_leaveTypeRepository);
+        var validator = new CreateLeaveAllocationDTOValidator(_unitOfWork.LeaveTypeRepository);
 
         var validationResult = await validator.ValidateAsync(request.CreateLeaveAllocationDTO);
 
         if (!validationResult.IsValid) throw new ValidationException(validationResult);
         else 
         {
-            var leaveType = await _leaveTypeRepository.GetAsync(request.CreateLeaveAllocationDTO.LeaveTypeID);
+            var leaveType = await _unitOfWork.LeaveTypeRepository.GetAsync(request.CreateLeaveAllocationDTO.LeaveTypeID);
             var employees = await _userService.GetEmployees();
             var period = DateTime.Now.Year;
             var allocations = new List<LeaveAllocation>();
             foreach (var emp in employees)
             {
-                if (await _leaveAllocationRepository.AllocationExists(emp.ID, leaveType.ID, period))
+                if (await _unitOfWork.LeaveAllocationRepository.AllocationExists(emp.ID, leaveType.ID, period))
                     continue;
                 allocations.Add(new LeaveAllocation
                 {
@@ -54,7 +52,9 @@ public class CreateLeaveAllocationCommandHandler : IRequestHandler<CreateLeaveAl
                 });
             }
 
-            await _leaveAllocationRepository.AddAllocations(allocations);
+            await _unitOfWork.LeaveAllocationRepository.AddAllocations(allocations);
+
+            await _unitOfWork.Save();
 
             return Unit.Value;
         }

@@ -20,6 +20,7 @@ public static class PersistenceServicesRegistration
         services.AddScoped<ILeaveAllocationRepository, LeaveAllocationRepository>();
         services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
         services.AddScoped<ILeaveTypeRepository, LeaveTypeRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         
         return services;
     }

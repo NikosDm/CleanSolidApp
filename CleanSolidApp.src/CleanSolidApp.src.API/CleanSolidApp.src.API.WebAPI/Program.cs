@@ -1,3 +1,4 @@
+using CleanSolidApp.src.API.WebAPI.Middleware;
 using CleanSolidApp.src.Core.Application;
 using CleanSolidApp.src.Data.Identity;
 using CleanSolidApp.src.Data.Infrastructure;
@@ -40,6 +41,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthentication();
 

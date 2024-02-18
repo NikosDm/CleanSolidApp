@@ -14,12 +14,12 @@ namespace CleanSolidApp.src.Core.Application.Features.LeaveTypes.Handlers.Comman
 
 public class CreateLeaveTypeCommandHandler : IRequestHandler<CreateLeaveTypeCommand, int>
 {
-    private readonly ILeaveTypeRepository _leaveTypeRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateLeaveTypeCommandHandler(ILeaveTypeRepository leaveTypeRepository, IMapper mapper)
+    public CreateLeaveTypeCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _leaveTypeRepository = leaveTypeRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -33,7 +33,9 @@ public class CreateLeaveTypeCommandHandler : IRequestHandler<CreateLeaveTypeComm
 
         var leaveType = _mapper.Map<LeaveType>(request.LeaveTypeDTO);
 
-        leaveType = await _leaveTypeRepository.AddAsync(leaveType);
+        leaveType = await _unitOfWork.LeaveTypeRepository.AddAsync(leaveType);
+
+        await _unitOfWork.Save();
 
         return leaveType.ID;
     }
